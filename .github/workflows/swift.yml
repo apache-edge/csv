@@ -9,9 +9,13 @@ on:
 jobs:
   build:
     name: Build and Test
-    runs-on: macos-latest
+    runs-on: macos-14 # Using macOS 14 (Sonoma) which has better Swift 6 support
     steps:
     - uses: actions/checkout@v3
+    - name: Set up Swift
+      uses: swift-actions/setup-swift@v1
+      with:
+        swift-version: '6.0.0-dev'
     - name: Build
       run: swift build -v
     - name: Run tests
@@ -20,14 +24,14 @@ jobs:
   docc:
     name: Build and Publish DocC
     needs: build
-    runs-on: macos-latest
+    runs-on: macos-14 # Using macOS 14 (Sonoma) which has better Swift 6 support
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - name: Set up Swift
         uses: swift-actions/setup-swift@v1
         with:
-          swift-version: '6.0'
+          swift-version: '6.0.0-dev'
       
       - name: Build Documentation
         run: |
