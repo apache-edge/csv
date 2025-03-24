@@ -12,13 +12,11 @@ jobs:
     runs-on: macos-14 # Using macOS 14 (Sonoma)
     steps:
     - uses: actions/checkout@v3
-    - name: Install Swift Toolchain
-      run: |
-        curl -sL https://download.swift.org/swift-6.0-branch/xcode/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a-osx.pkg -o swift.pkg
-        sudo installer -pkg swift.pkg -target /
-        echo "PATH=/Library/Developer/Toolchains/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a.xctoolchain/usr/bin:$PATH" >> $GITHUB_ENV
     - name: Swift Version
       run: swift --version
+    - name: Temporarily modify swift-tools-version
+      run: |
+        sed -i '' 's/swift-tools-version: 6.0/swift-tools-version: 5.9/' Package.swift
     - name: Build
       run: swift build -v
     - name: Run tests
@@ -28,9 +26,14 @@ jobs:
     name: Build and Test on Linux
     runs-on: ubuntu-latest
     container:
-      image: swift:6.0.0-jammy # Using the Swift 6.0 Docker image
+      image: swiftlang/swift:nightly-jammy # Using the nightly Swift Docker image
     steps:
     - uses: actions/checkout@v3
+    - name: Swift Version
+      run: swift --version
+    - name: Temporarily modify swift-tools-version
+      run: |
+        sed -i 's/swift-tools-version: 6.0/swift-tools-version: 5.9/' Package.swift
     - name: Build
       run: swift build -v
     - name: Run tests
@@ -43,13 +46,11 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
-      - name: Install Swift Toolchain
-        run: |
-          curl -sL https://download.swift.org/swift-6.0-branch/xcode/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a-osx.pkg -o swift.pkg
-          sudo installer -pkg swift.pkg -target /
-          echo "PATH=/Library/Developer/Toolchains/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a.xctoolchain/usr/bin:$PATH" >> $GITHUB_ENV
       - name: Swift Version
         run: swift --version
+      - name: Temporarily modify swift-tools-version
+        run: |
+          sed -i '' 's/swift-tools-version: 6.0/swift-tools-version: 5.9/' Package.swift
       
       - name: Build Documentation
         run: |
