@@ -34,31 +34,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v1
         with:
-          xcode-version: latest-stable
+          swift-version: "6.0"
       - name: Swift Version
         run: swift --version
       
-      - name: Build Documentation
-        run: |
-          mkdir -p ./docs
-          
-          # Build the documentation
-          xcodebuild docbuild \
-            -scheme CSV \
-            -derivedDataPath /tmp/docbuild \
-            -destination 'platform=macOS'
-            
-          # Copy the built documentation to the docs directory
-          cp -R /tmp/docbuild/Build/Products/Debug/*.doccarchive ./docs
-          
-          # Convert to static website
-          $(xcrun --find docc) process-archive \
-            transform-for-static-hosting ./docs/*.doccarchive \
-            --hosting-base-path csv \
-            --output-path ./docs
+      - name: Generate Documentation
+        uses: fwcd/swift-docc-action@v1
+        with:
+          target: CSV
+          output: ./docs
+          hosting-base-path: csv
+          disable-indexing: true
+          transform-for-static-hosting: true
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
