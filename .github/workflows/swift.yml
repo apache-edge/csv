@@ -34,20 +34,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install Swift Toolchain
-        run: |
-          curl -L https://download.swift.org/swift-6.0-release/xcode/swift-6.0-RELEASE/swift-6.0-RELEASE-osx.pkg -o swift.pkg
-          sudo installer -pkg swift.pkg -target /
-          echo "PATH=/Library/Developer/Toolchains/swift-6.0-RELEASE.xctoolchain/usr/bin:$PATH" >> $GITHUB_ENV
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - name: Swift Version
         run: swift --version
       
       - name: Build Documentation
         run: |
-          swift package --allow-writing-to-directory ./docs generate-documentation \
-            --target CSV \
-            --disable-indexing \
-            --transform-for-static-hosting \
+          mkdir -p ./docs
+          
+          # Build the documentation
+          xcodebuild docbuild \
+            -scheme CSV \
+            -derivedDataPath /tmp/docbuild \
+            -destination 'platform=macOS'
+            
+          # Copy the built documentation to the docs directory
+          cp -R /tmp/docbuild/Build/Products/Debug/*.doccarchive ./docs
+          
+          # Convert to static website
+          $(xcrun --find docc) process-archive \
+            transform-for-static-hosting ./docs/*.doccarchive \
             --hosting-base-path csv \
             --output-path ./docs
       
