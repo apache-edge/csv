@@ -4,6 +4,7 @@ A Cross-Platform Swift 6 Library for CSV Parsing with Concurrency Support
 
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
 [![Platforms](https://img.shields.io/badge/Platforms-macOS%20|%20iOS%20|%20watchOS%20|%20tvOS%20|%20Linux%20|%20Android%20|%20Windows-blue.svg)](https://swift.org)
+[![CI](https://github.com/apache-edge/csv/actions/workflows/swift.yml/badge.svg)](https://github.com/apache-edge/csv/actions/workflows/swift.yml)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 A cross-platform Swift 6 library for CSV parsing with concurrency support. Works on Apple platforms (iOS, macOS, tvOS, watchOS), Linux, Android, and Windows.
