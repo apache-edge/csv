@@ -34,15 +34,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Swift
-        uses: swift-actions/setup-swift@v1
-        with:
-          swift-version: "5.9"
+      - name: Install Swift Toolchain
+        run: |
+          curl -L https://download.swift.org/swift-development/xcode/latest/swift-DEVELOPMENT-SNAPSHOT-latest-osx.pkg -o swift.pkg
+          sudo installer -pkg swift.pkg -target /
+          echo "PATH=/Library/Developer/Toolchains/swift-latest.xctoolchain/usr/bin:$PATH" >> $GITHUB_ENV
       - name: Swift Version
         run: swift --version
-      - name: Temporarily modify swift-tools-version
-        run: |
-          sed -i '' 's/swift-tools-version: 6.0/swift-tools-version: 5.9/' Package.swift
       
       - name: Build Documentation
         run: |
