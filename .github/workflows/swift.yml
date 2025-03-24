@@ -9,13 +9,16 @@ on:
 jobs:
   build-macos:
     name: Build and Test on macOS
-    runs-on: macos-14 # Using macOS 14 (Sonoma) which has better Swift 6 support
+    runs-on: macos-14 # Using macOS 14 (Sonoma)
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Swift
-      uses: swift-actions/setup-swift@v1
-      with:
-        swift-version: '6.0.0-dev'
+    - name: Install Swift Toolchain
+      run: |
+        curl -sL https://download.swift.org/swift-6.0-branch/xcode/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a-osx.pkg -o swift.pkg
+        sudo installer -pkg swift.pkg -target /
+        echo "PATH=/Library/Developer/Toolchains/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a.xctoolchain/usr/bin:$PATH" >> $GITHUB_ENV
+    - name: Swift Version
+      run: swift --version
     - name: Build
       run: swift build -v
     - name: Run tests
@@ -36,14 +39,17 @@ jobs:
   docc:
     name: Build and Publish DocC
     needs: [build-macos, build-linux]
-    runs-on: macos-14 # Using macOS 14 (Sonoma) which has better Swift 6 support
+    runs-on: macos-14 # Using macOS 14 (Sonoma)
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Swift
-        uses: swift-actions/setup-swift@v1
-        with:
-          swift-version: '6.0.0-dev'
+      - name: Install Swift Toolchain
+        run: |
+          curl -sL https://download.swift.org/swift-6.0-branch/xcode/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a-osx.pkg -o swift.pkg
+          sudo installer -pkg swift.pkg -target /
+          echo "PATH=/Library/Developer/Toolchains/swift-6.0-DEVELOPMENT-SNAPSHOT-2024-03-05-a.xctoolchain/usr/bin:$PATH" >> $GITHUB_ENV
+      - name: Swift Version
+        run: swift --version
       
       - name: Build Documentation
         run: |
