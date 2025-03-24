@@ -12,11 +12,25 @@ jobs:
     runs-on: macos-14 # Using macOS 14 (Sonoma)
     steps:
     - uses: actions/checkout@v3
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v1
+      with:
+        swift-version: "5.9"
     - name: Swift Version
       run: swift --version
     - name: Temporarily modify swift-tools-version
       run: |
         sed -i '' 's/swift-tools-version: 6.0/swift-tools-version: 5.9/' Package.swift
+    - name: Temporarily modify test files for Swift 5.9 compatibility
+      run: |
+        # Replace Testing import with XCTest
+        find Tests -name "*.swift" -type f -exec sed -i '' 's/import Testing/import XCTest/' {} \;
+        # Replace #expect macros with XCTAssert
+        find Tests -name "*.swift" -type f -exec sed -i '' 's/#expect(\(.*\) == \(.*\))/XCTAssertEqual(\1, \2)/' {} \;
+        find Tests -name "*.swift" -type f -exec sed -i '' 's/#expect(\(.*\), \(.*\))/XCTAssert(\1, \2)/' {} \;
+        find Tests -name "*.swift" -type f -exec sed -i '' 's/#expect(\(.*\))/XCTAssert(\1)/' {} \;
+        # Replace @Test with standard XCTest functions
+        find Tests -name "*.swift" -type f -exec sed -i '' 's/@Test func test/func test/' {} \;
     - name: Build
       run: swift build -v
     - name: Run tests
@@ -25,15 +39,27 @@ jobs:
   build-linux:
     name: Build and Test on Linux
     runs-on: ubuntu-latest
-    container:
-      image: swiftlang/swift:nightly-jammy # Using the nightly Swift Docker image
     steps:
     - uses: actions/checkout@v3
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v1
+      with:
+        swift-version: "5.9"
     - name: Swift Version
       run: swift --version
     - name: Temporarily modify swift-tools-version
       run: |
         sed -i 's/swift-tools-version: 6.0/swift-tools-version: 5.9/' Package.swift
+    - name: Temporarily modify test files for Swift 5.9 compatibility
+      run: |
+        # Replace Testing import with XCTest
+        find Tests -name "*.swift" -type f -exec sed -i 's/import Testing/import XCTest/' {} \;
+        # Replace #expect macros with XCTAssert
+        find Tests -name "*.swift" -type f -exec sed -i 's/#expect(\(.*\) == \(.*\))/XCTAssertEqual(\1, \2)/' {} \;
+        find Tests -name "*.swift" -type f -exec sed -i 's/#expect(\(.*\), \(.*\))/XCTAssert(\1, \2)/' {} \;
+        find Tests -name "*.swift" -type f -exec sed -i 's/#expect(\(.*\))/XCTAssert(\1)/' {} \;
+        # Replace @Test with standard XCTest functions
+        find Tests -name "*.swift" -type f -exec sed -i 's/@Test func test/func test/' {} \;
     - name: Build
       run: swift build -v
     - name: Run tests
@@ -46,11 +72,25 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: "5.9"
       - name: Swift Version
         run: swift --version
       - name: Temporarily modify swift-tools-version
         run: |
           sed -i '' 's/swift-tools-version: 6.0/swift-tools-version: 5.9/' Package.swift
+      - name: Temporarily modify test files for Swift 5.9 compatibility
+        run: |
+          # Replace Testing import with XCTest
+          find Tests -name "*.swift" -type f -exec sed -i '' 's/import Testing/import XCTest/' {} \;
+          # Replace #expect macros with XCTAssert
+          find Tests -name "*.swift" -type f -exec sed -i '' 's/#expect(\(.*\) == \(.*\))/XCTAssertEqual(\1, \2)/' {} \;
+          find Tests -name "*.swift" -type f -exec sed -i '' 's/#expect(\(.*\), \(.*\))/XCTAssert(\1, \2)/' {} \;
+          find Tests -name "*.swift" -type f -exec sed -i '' 's/#expect(\(.*\))/XCTAssert(\1)/' {} \;
+          # Replace @Test with standard XCTest functions
+          find Tests -name "*.swift" -type f -exec sed -i '' 's/@Test func test/func test/' {} \;
       
       - name: Build Documentation
         run: |
