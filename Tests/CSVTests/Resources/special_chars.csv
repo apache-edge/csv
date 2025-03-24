@@ -1,0 +1,5 @@
+name,message,symbol
+John,"Hello, world!",@
+Alice,"Line 1
+Line 2",#
+Bob,"Tabs	and spaces",*
