@@ -30,7 +30,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/apache-edge/csv.git", from: "0.0.1")
+    .package(url: "https://github.com/apache-edge/csv.git", from: "0.1.0")
 ]
 ```
 
