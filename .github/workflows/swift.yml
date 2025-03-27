@@ -1,58 +1,28 @@
-name: Swift
+name: swift
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [ main, master, develop ]
 
 jobs:
-  linux:
-    name: Build and Test
-    runs-on: ubuntu-latest
-    container:
-      image: swift:6.0
+  # Build and test on multiple platforms
+  build-and-test:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        swift: ["6.0.0"]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Swift Version
-        run: swift --version
-      - name: Build
-        run: swift build -v
-      - name: Run tests
-        run: swift test -v
-      
-  docc:
-    name: Documentation
-    needs: [linux]
-    runs-on: macos-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Swift
-        uses: swift-actions/setup-swift@v1
-        with:
-          swift-version: "6.0"
-      - name: Swift Version
-        run: swift --version
-      
-      - name: Generate Documentation
-        uses: fwcd/swift-docc-action@v1
-        with:
-          target: CSV
-          output: ./docs
-          hosting-base-path: csv
-          disable-indexing: true
-          transform-for-static-hosting: true
-      
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
-          publish_branch: gh-pages
+    - uses: actions/checkout@v4
+    - name: Setup Swift
+      uses: SwiftyLab/setup-swift@v1
+      with:
+        swift-version: ${{ matrix.swift }}
+    - name: Build
+      run: swift build -c release
+    - name: Run tests with Swift Testing
+      run: swift test
